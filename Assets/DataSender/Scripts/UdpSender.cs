@@ -18,19 +18,28 @@ public class UdpSender : MonoBehaviour
         Send(sendTextData);
     }
 
-    public void Send<T>(T data)
+    public void Send<T>(T data, IPEndPoint remote = null)
     {
         var text = JsonUtility.ToJson(data);
-        Send(text);
+        if (remote == null)
+            remote = this.remote;
+        Send(text, remote);
     }
 
-    public void Send(string text)
+    public void Send(string text, IPEndPoint remote = null)
     {
         sendTextData = text;
         var data = Encoding.UTF8.GetBytes(sendTextData);
+        Send(data, remote);
+    }
+
+    public void Send(byte[] data, IPEndPoint remote = null)
+    {
+        if (remote == null)
+            remote = this.remote;
         udp.SendTo(data, remote);
     }
-    
+
     void Start()
     {
         udp = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);

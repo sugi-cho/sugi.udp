@@ -1,12 +1,14 @@
 ﻿using UnityEngine;
 
-public class TestDataSender : MonoBehaviour {
+public class TestDataSender : MonoBehaviour
+{
     public UdpSender sender;
     public TestData dataForSend;
     public TestData receivedData;
 
-    public void ReceiveData(string json)
+    public void ReceiveData(byte[] data)
     {
+        var json = System.Text.Encoding.UTF8.GetString(data);
         JsonUtility.FromJsonOverwrite(json, receivedData);
     }
 

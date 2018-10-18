@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Net;
 using System.Net.Sockets;
@@ -9,21 +8,20 @@ using UnityEngine.Events;
 public class UdpServer : MonoBehaviour
 {
     public int localPort = 8888;
-    public string receivedText;
-    public TextEvent onTextDataReceived;
+    public BytesEvent onDataReceived;
     public int receiveLimit = 10;
 
     Socket udp;
     Thread reader;
     byte[] receiveBuffer;
-    Queue<string> receivedTextQueue;
-    
+    Queue<byte[]> receivedDataQueue;
+
     void Start()
     {
         udp = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         udp.Bind(new IPEndPoint(IPAddress.Any, localPort));
         receiveBuffer = new byte[1 << 16];
-        receivedTextQueue = new Queue<string>();
+        receivedDataQueue = new Queue<byte[]>();
 
         reader = new Thread(Reader);
         reader.Start();
@@ -31,11 +29,9 @@ public class UdpServer : MonoBehaviour
 
     private void Update()
     {
-        while (0 < receivedTextQueue.Count)
-        {
-            var text = receivedTextQueue.Dequeue();
-            onTextDataReceived.Invoke(text);
-        }
+        lock (receivedDataQueue)
+            while (0 < receivedDataQueue.Count)
+                onDataReceived.Invoke(receivedDataQueue.Dequeue());
     }
 
     private void OnDestroy()
@@ -57,14 +53,17 @@ public class UdpServer : MonoBehaviour
                 var length = udp.ReceiveFrom(receiveBuffer, ref fromendpoint);
                 if (length == 0 || (clientEndpoint = fromendpoint as IPEndPoint) == null)
                     continue;
-                receivedText = Encoding.UTF8.GetString(receiveBuffer, 0, length);
-                if (receiveLimit <= 0 || receivedTextQueue.Count < receiveLimit)
-                    receivedTextQueue.Enqueue(receivedText);
+                if (receiveLimit <= 0 || receivedDataQueue.Count < receiveLimit)
+                {
+                    var data = new byte[length];
+                    System.Buffer.BlockCopy(receiveBuffer, 0, data, 0, length);
+                    receivedDataQueue.Enqueue(data);
+                }
             }
             catch { }
         }
     }
 
     [System.Serializable]
-    public class TextEvent : UnityEvent<string> { }
+    public class BytesEvent : UnityEvent<byte[]> { }
 }
