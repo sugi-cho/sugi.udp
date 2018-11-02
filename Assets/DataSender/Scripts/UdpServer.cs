@@ -57,7 +57,8 @@ public class UdpServer : MonoBehaviour
                 {
                     var data = new byte[length];
                     System.Buffer.BlockCopy(receiveBuffer, 0, data, 0, length);
-                    receivedDataQueue.Enqueue(data);
+                    lock (receivedDataQueue)
+                        receivedDataQueue.Enqueue(data);
                 }
             }
             catch { }

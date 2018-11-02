@@ -267,6 +267,9 @@ GameObject:
   - component: {fileID: 1780729732}
   - component: {fileID: 1780729735}
   - component: {fileID: 1780729734}
+  - component: {fileID: 1780729736}
+  - component: {fileID: 1780729737}
+  - component: {fileID: 1780729738}
   m_Layer: 0
   m_Name: UdpTest
   m_TagString: Untagged
@@ -287,7 +290,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sendTextData: test
   remoteIp: localhost
-  remotePort: 8888
+  useBroadCast: 0
+  remotePort: 10000
 --- !u!4 &1780729733
 Transform:
   m_ObjectHideFlags: 0
@@ -342,7 +346,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1576aee08568364bbc2cf55151392b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  localPort: 8888
+  localPort: 10000
   onDataReceived:
     m_PersistentCalls:
       m_Calls:
@@ -356,7 +360,74 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
+        m_CallState: 0
+      - m_Target: {fileID: 1780729737}
+        m_MethodName: OnUdpData
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1780729736}
+        m_MethodName: EnqueueData
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
         m_CallState: 2
     m_TypeName: UdpServer+BytesEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   receiveLimit: 10
+  dataCount: 0
+--- !u!114 &1780729736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1780729731}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf956fff344845e48abdd6f4edbd088c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sender: {fileID: 1780729732}
+  recordFilePath: testData.udp
+  playFilePath: testData.udp
+  time: 0
+  writeCount: 0
+  exeption: 
+--- !u!114 &1780729737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1780729731}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0433deb3ef6af8843ac15774bf3818e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dataFetched: 
+--- !u!114 &1780729738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1780729731}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71e94bacb0e2af9468b2f8d6ba1bcc0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sender: {fileID: 1780729732}
+  numData: 1
+  sendFPS: 60
+  dataSize: 512

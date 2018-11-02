@@ -7,6 +7,7 @@ public class UdpSender : MonoBehaviour
 {
     public string sendTextData = "test";
     public string remoteIp = "localhost";
+    public bool useBroadCast;
     public int remotePort = 8888;
 
     Socket udp;
@@ -43,7 +44,10 @@ public class UdpSender : MonoBehaviour
     void Start()
     {
         udp = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        remote = new IPEndPoint(FindFromHostName(remoteIp), remotePort);
+        if (useBroadCast)
+            remote = new IPEndPoint(IPAddress.Broadcast, remotePort);
+        else
+            remote = new IPEndPoint(FindFromHostName(remoteIp), remotePort);
     }
 
     private void OnDestroy()

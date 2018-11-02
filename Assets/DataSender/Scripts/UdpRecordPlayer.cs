@@ -14,10 +14,11 @@ public class UdpRecordPlayer : MonoBehaviour
     Thread recorder;
     Thread player;
     float startTime;
-    float time;
+    public float time;
 
     bool recording;
     bool playing;
+    public string exeption;
 
     private void OnDestroy()
     {
@@ -42,6 +43,7 @@ public class UdpRecordPlayer : MonoBehaviour
         if (recorder != null)
             recorder.Abort();
         recorder = new Thread(RecordLoop);
+        writeCount = 0;
         recorder.Start();
     }
     [ContextMenu("Play RecordedData")]
@@ -77,18 +79,31 @@ public class UdpRecordPlayer : MonoBehaviour
 
     void RecordLoop()
     {
-        using (var stream = new FileStream(recordFilePath, FileMode.Create, FileAccess.Write))
+        using (var stream = new MemoryStream())
         using (var writer = new BinaryWriter(stream))
         {
             while (recording)
-                while (0 < recordQueue.Count)
-                    lock (recordQueue)
+                lock (recordQueue)
+                    while (0 < recordQueue.Count)
                     {
                         var data = recordQueue.Dequeue();
-                        writer.Write(time);
-                        writer.Write(data.Length);
-                        writer.Write(data);
+                        try
+                        {
+                            if (data != null)
+                            {
+                                writer.Write(time);
+                                writer.Write(data.Length);
+                                writer.Write(data);
+                            }
+                        }
+                        catch (System.Exception e)
+                        {
+                            exeption = e.ToString();
+                        }
                     }
+            stream.Flush();
+            File.WriteAllBytes(recordFilePath, stream.GetBuffer());
+
             writer.Close();
             stream.Close();
         }
@@ -107,7 +122,8 @@ public class UdpRecordPlayer : MonoBehaviour
                     var nextTime = reader.ReadSingle();
                     var count = reader.ReadInt32();
                     var data = reader.ReadBytes(count);
-                    while (time < nextTime && playing) {
+                    while (time < nextTime && playing)
+                    {
                         //Playを止めたときとか、このループを出れるように作っておかないと死ぬ
                     }
                     sender.Send(data);
