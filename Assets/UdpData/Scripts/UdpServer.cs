@@ -10,24 +10,24 @@ public class UdpServer : MonoBehaviour
     public int localPort = 8888;
     public BytesEvent onDataReceived;
     public int receiveLimit = 10;
+    public string errorMsg;
 
     Socket udp;
     Thread reader;
     byte[] receiveBuffer;
-    Queue<byte[]> receivedDataQueue;
+    Queue<byte[]> receivedDataQueue = new Queue<byte[]>();
 
     void Start()
     {
         udp = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         udp.Bind(new IPEndPoint(IPAddress.Any, localPort));
         receiveBuffer = new byte[1 << 16];
-        receivedDataQueue = new Queue<byte[]>();
 
         reader = new Thread(Reader);
         reader.Start();
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         lock (receivedDataQueue)
             while (0 < receivedDataQueue.Count)
@@ -44,26 +44,39 @@ public class UdpServer : MonoBehaviour
 
     void Reader()
     {
+        var clientEndpoint = new IPEndPoint(IPAddress.Any, 0);
         while (udp != null)
         {
             try
             {
-                var clientEndpoint = new IPEndPoint(IPAddress.Any, 0);
                 var fromendpoint = (EndPoint)clientEndpoint;
                 var length = udp.ReceiveFrom(receiveBuffer, ref fromendpoint);
-                if (length == 0 || (clientEndpoint = fromendpoint as IPEndPoint) == null)
+                var fromipendpoint = fromendpoint as IPEndPoint;
+                if (length == 0 || fromipendpoint == null)
                     continue;
+
                 if (receiveLimit <= 0 || receivedDataQueue.Count < receiveLimit)
                 {
                     var data = new byte[length];
                     System.Buffer.BlockCopy(receiveBuffer, 0, data, 0, length);
-                    lock (receivedDataQueue)
-                        receivedDataQueue.Enqueue(data);
+                    OnReadPacket(data, fromipendpoint);
                 }
             }
-            catch { }
+            catch (System.Exception e) { OnRaiseError(e); }
         }
     }
+
+    protected virtual void OnReadPacket(byte[] data, IPEndPoint source)
+    {
+        lock (receivedDataQueue)
+            receivedDataQueue.Enqueue(data);
+    }
+
+    protected virtual void OnRaiseError(System.Exception e)
+    {
+        errorMsg = e.Message;
+    }
+
 
     [System.Serializable]
     public class BytesEvent : UnityEvent<byte[]> { }

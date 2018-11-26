@@ -13,6 +13,8 @@ public class SendMassDataTest : MonoBehaviour
     public int sendFPS = 60;
     public int dataSize = 530;
 
+    public bool send;
+
     Thread dataSender;
     byte[] data;
 
@@ -31,7 +33,8 @@ public class SendMassDataTest : MonoBehaviour
 
     void Update()
     {
-        for (var i = 0; i < numData; i++)
-            sender.Send(data);
+        if (send)
+            for (var i = 0; i < numData; i++)
+                sender.Send(data);
     }
 }

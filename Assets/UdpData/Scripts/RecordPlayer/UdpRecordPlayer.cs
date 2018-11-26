@@ -16,9 +16,11 @@ public class UdpRecordPlayer : MonoBehaviour
     float startTime;
     public float time;
 
-    bool recording;
-    bool playing;
-    public string exeption;
+    public bool recording { get; private set; }
+    public bool playing { get; private set; }
+    public long fileSize { get; private set; }
+    public string exception;
+
 
     private void OnDestroy()
     {
@@ -30,7 +32,6 @@ public class UdpRecordPlayer : MonoBehaviour
         if (!recording)
             return;
         recordQueue.Enqueue(data);
-        time = Time.time - startTime;
     }
 
     [ContextMenu("Start Recording")]
@@ -43,7 +44,6 @@ public class UdpRecordPlayer : MonoBehaviour
         if (recorder != null)
             recorder.Abort();
         recorder = new Thread(RecordLoop);
-        writeCount = 0;
         recorder.Start();
     }
     [ContextMenu("Play RecordedData")]
@@ -73,34 +73,37 @@ public class UdpRecordPlayer : MonoBehaviour
 
     private void Update()
     {
-        if (playing)
+        if (playing || recording)
             time = Time.time - startTime;
     }
 
     void RecordLoop()
     {
+        fileSize = 0;
         using (var stream = new MemoryStream())
         using (var writer = new BinaryWriter(stream))
         {
             while (recording)
-                lock (recordQueue)
-                    while (0 < recordQueue.Count)
-                    {
-                        var data = recordQueue.Dequeue();
-                        try
+                try
+                {
+                    lock (recordQueue)
+                        while (0 < recordQueue.Count)
                         {
+                            var data = recordQueue.Dequeue();
                             if (data != null)
                             {
                                 writer.Write(time);
                                 writer.Write(data.Length);
                                 writer.Write(data);
+                                fileSize = stream.Length;
                             }
                         }
-                        catch (System.Exception e)
-                        {
-                            exeption = e.ToString();
-                        }
-                    }
+                    Thread.Sleep(0);
+                }
+                catch (System.Exception e)
+                {
+                    exception = e.ToString();
+                }
             stream.Flush();
             File.WriteAllBytes(recordFilePath, stream.GetBuffer());
 
@@ -115,6 +118,7 @@ public class UdpRecordPlayer : MonoBehaviour
         using (var stream = new MemoryStream(recordedData))
         using (var reader = new BinaryReader(stream))
         {
+            fileSize = stream.Length;
             while (playing)
             {
                 try
@@ -124,7 +128,7 @@ public class UdpRecordPlayer : MonoBehaviour
                     var data = reader.ReadBytes(count);
                     while (time < nextTime && playing)
                     {
-                        //Playを止めたときとか、このループを出れるように作っておかないと死ぬ
+                        Thread.Sleep(0);
                     }
                     sender.Send(data);
                 }
@@ -134,6 +138,10 @@ public class UdpRecordPlayer : MonoBehaviour
                     reader.Close();
                     stream.Close();
                     return;
+                }
+                catch (System.Exception e)
+                {
+                    exception = e.ToString();
                 }
             }
             reader.Close();
