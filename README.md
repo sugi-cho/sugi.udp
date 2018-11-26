@@ -2,16 +2,16 @@
 
 ## UDP
 
-[udpTest.unity](./Assets/UdpTata/udpTest.unity)
+[udpTest.unity](./Assets/UdpData/udpTest.unity)
 
 ## Osc
 
-[oscTest.unity](./Assets/UdpTata/oscTest.unity)
+[oscTest.unity](./Assets/UdpData/oscTest.unity)
 
 ## ArtNet
 
-[artnetTest.unity](./Assets/UdpTata/artnetTest.unity)
+[artnetTest.unity](./Assets/UdpData/artnetTest.unity)
 
 ## Recorder
 
-[recorder.unity](./Assets/UdpTata/recorder.unity)
+[recorder.unity](./Assets/UdpData/recorder.unity)
