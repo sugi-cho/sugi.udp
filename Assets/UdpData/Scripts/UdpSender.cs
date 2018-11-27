@@ -13,6 +13,14 @@ public class UdpSender : MonoBehaviour
     Socket udp;
     IPEndPoint remote;
 
+    public void CreateRemoteEP(string ip, int port)
+    {
+        if (useBroadCast)
+            remote = new IPEndPoint(IPAddress.Broadcast, port);
+        else
+            remote = new IPEndPoint(FindFromHostName(remoteIp), port);
+    }
+
     [ContextMenu("send test")]
     void Send()
     {
@@ -44,10 +52,7 @@ public class UdpSender : MonoBehaviour
     void Start()
     {
         udp = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        if (useBroadCast)
-            remote = new IPEndPoint(IPAddress.Broadcast, remotePort);
-        else
-            remote = new IPEndPoint(FindFromHostName(remoteIp), remotePort);
+        CreateRemoteEP(remoteIp, remotePort);
     }
 
     private void OnDestroy()

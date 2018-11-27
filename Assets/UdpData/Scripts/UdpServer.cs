@@ -17,14 +17,25 @@ public class UdpServer : MonoBehaviour
     byte[] receiveBuffer;
     Queue<byte[]> receivedDataQueue = new Queue<byte[]>();
 
-    void Start()
+    public void StartServer(int port)
     {
+        if (reader != null)
+            reader.Abort();
+        if (udp != null)
+            udp.Close();
         udp = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+
+        localPort = port;
         udp.Bind(new IPEndPoint(IPAddress.Any, localPort));
-        receiveBuffer = new byte[1 << 16];
 
         reader = new Thread(Reader);
         reader.Start();
+    }
+
+    void Start()
+    {
+        receiveBuffer = new byte[1 << 16];
+        StartServer(localPort);
     }
 
     protected virtual void Update()
@@ -74,7 +85,7 @@ public class UdpServer : MonoBehaviour
 
     protected virtual void OnRaiseError(System.Exception e)
     {
-        errorMsg = e.Message;
+        errorMsg = e.ToString();
     }
 
 

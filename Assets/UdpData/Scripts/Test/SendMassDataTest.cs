@@ -33,6 +33,10 @@ public class SendMassDataTest : MonoBehaviour
 
     void Update()
     {
+        var ms = (Time.time * 1000).ToString("0000000000");
+        var bytes = System.Text.Encoding.UTF8.GetBytes(ms);
+        System.Buffer.BlockCopy(bytes, 0, data, 0, bytes.Length);
+
         if (send)
             for (var i = 0; i < numData; i++)
                 sender.Send(data);
