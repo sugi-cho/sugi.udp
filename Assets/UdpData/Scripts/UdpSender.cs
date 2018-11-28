@@ -15,8 +15,11 @@ public class UdpSender : MonoBehaviour
 
     public void CreateRemoteEP(string ip, int port)
     {
+        remoteIp = ip;
+        remotePort = port;
+
         if (useBroadCast)
-            remote = new IPEndPoint(IPAddress.Broadcast, port);
+            remote = new IPEndPoint(IPAddress.Broadcast, remotePort);
         else
             remote = new IPEndPoint(FindFromHostName(remoteIp), port);
     }

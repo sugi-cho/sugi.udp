@@ -19,9 +19,9 @@ public class RecorderApp : MonoBehaviour
 
     string error = "";
 
-    string remoteIp = "255.255.255.255";
-    int remotePort = 8888;
-    int localPort = 8888;
+    string remoteIp;
+    int remotePort;
+    int localPort;
 
     public UdpSender sender;
     public UdpServer server;
@@ -57,7 +57,7 @@ public class RecorderApp : MonoBehaviour
         if (!Directory.Exists(parent))
             Directory.CreateDirectory(parent);
 
-        GUILayout.Label("Folder Path:");
+        GUILayout.Label("FolderPath:");
         if (GUILayout.Button(parent))
             OpenInFileBrowser.Open(parent);
 
