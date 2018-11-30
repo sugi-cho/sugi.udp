@@ -5,17 +5,15 @@ using System.Net.Sockets;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class UdpServer : MonoBehaviour
+public abstract class UdpServer : MonoBehaviour
 {
     public int localPort = 8888;
-    public BytesEvent onDataReceived;
     public int receiveLimit = 10;
     public string errorMsg;
 
     Socket udp;
     Thread reader;
     byte[] receiveBuffer;
-    Queue<byte[]> receivedDataQueue = new Queue<byte[]>();
 
     public void StartServer(int port)
     {
@@ -38,12 +36,6 @@ public class UdpServer : MonoBehaviour
         StartServer(localPort);
     }
 
-    protected virtual void Update()
-    {
-        lock (receivedDataQueue)
-            while (0 < receivedDataQueue.Count)
-                onDataReceived.Invoke(receivedDataQueue.Dequeue());
-    }
 
     private void OnDestroy()
     {
@@ -66,29 +58,16 @@ public class UdpServer : MonoBehaviour
                 if (length == 0 || fromipendpoint == null)
                     continue;
 
-                if (receiveLimit <= 0 || receivedDataQueue.Count < receiveLimit)
-                {
-                    var data = new byte[length];
-                    System.Buffer.BlockCopy(receiveBuffer, 0, data, 0, length);
-                    OnReadPacket(data, fromipendpoint);
-                }
+                OnReadPacket(receiveBuffer, length, fromipendpoint);
             }
             catch (System.Exception e) { OnRaiseError(e); }
         }
     }
 
-    protected virtual void OnReadPacket(byte[] data, IPEndPoint source)
-    {
-        lock (receivedDataQueue)
-            receivedDataQueue.Enqueue(data);
-    }
+    protected abstract void OnReadPacket(byte[] buffer, int length, IPEndPoint source);
 
     protected virtual void OnRaiseError(System.Exception e)
     {
         errorMsg = e.ToString();
     }
-
-
-    [System.Serializable]
-    public class BytesEvent : UnityEvent<byte[]> { }
 }

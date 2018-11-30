@@ -266,6 +266,7 @@ GameObject:
   - component: {fileID: 759218395}
   - component: {fileID: 759218394}
   - component: {fileID: 759218393}
+  - component: {fileID: 759218396}
   m_Layer: 0
   m_Name: ArtNetServer
   m_TagString: Untagged
@@ -297,14 +298,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   localPort: 6454
-  onDataReceived:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UdpServer+BytesEvent, Assembly-CSharp, Version=1.0.6902.38428, Culture=neutral,
-      PublicKeyToken=null
   receiveLimit: 10
   errorMsg: 
-  onArtNet:
+  onDataReceived:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 759218393}
@@ -318,8 +314,28 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-    m_TypeName: ArtNetServer+ArtNetEvent, Assembly-CSharp, Version=1.0.6902.38428,
+    m_TypeName: ArtNetServer+ArtNetEvent, Assembly-CSharp, Version=1.0.6908.28495,
       Culture=neutral, PublicKeyToken=null
+  dmxUniverseEvents:
+  - label: Dmx Universe Watcher
+    universe: 0
+    dmxEvent:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 759218396}
+          m_MethodName: GetDmxData
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: ArtNetServer+DmxDataEvent, Assembly-CSharp, Version=1.0.6908.28495,
+        Culture=neutral, PublicKeyToken=null
+  dmxMergeMode: 0
 --- !u!4 &759218395
 Transform:
   m_ObjectHideFlags: 0
@@ -333,3 +349,15 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &759218396
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 759218392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6abf8f566f5df974f9e4ae1d4557cacf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dmxData: 

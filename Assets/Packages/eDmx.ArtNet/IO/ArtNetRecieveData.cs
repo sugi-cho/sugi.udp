@@ -5,13 +5,7 @@
         public byte[] buffer = new byte[1500];
         public int bufferSize = 1500;
         public int DataLength = 0;
-
-        //public ArtNetRecieveData() { }
-        public ArtNetRecieveData(byte[] data)
-        {
-            buffer = data;
-            DataLength = data.Length;
-        }
+        
 
         public bool Valid
         {

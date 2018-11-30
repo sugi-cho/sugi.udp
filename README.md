@@ -40,7 +40,7 @@ UdpPacketの記録と再生ができます。
 
 ### FolderPath
 
-レコードデータを保存するフォルダです。ボタンを押すと、フォルダが開きます。（現状、StreamingAssetsフォルダ内に保存）
+レコードデータを保存するフォルダです。ボタンを押すと、フォルダが開きます。（現状、StreamingAssetsフォルダ内に保存、**Editor内でレコード開始→別アプリでOSC操作→UnityEditorに戻る、と操作すると、UnityEditorが新しく作られたレコード中のファイルを読み込もうとして怒られます**）
 
 ### FileName
 

@@ -7,10 +7,15 @@ using ArtNet.Enums;
 public class FetchArtNet : MonoBehaviour {
 
     public byte[] dmxData;
+    public ArtNetOpCodes opCode;
+    public string protocol;
 
     public void OnArtNet(ArtNetPacket packet)
     {
-        if (packet.OpCode == ArtNetOpCodes.Dmx)
+        opCode = packet.OpCode;
+        protocol = packet.Protocol;
+
+        if (opCode == ArtNetOpCodes.Dmx)
             dmxData = ((ArtNetDmxPacket)packet).DmxData;
     }
 }
