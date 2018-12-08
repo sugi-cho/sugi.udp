@@ -49,7 +49,6 @@ public class OscServer : UdpServer
     [System.Serializable]
     public struct OscAddressEventPair
     {
-        public string label;
         public string oscAddress;
         public OscDataEvent oscEvent;
     }

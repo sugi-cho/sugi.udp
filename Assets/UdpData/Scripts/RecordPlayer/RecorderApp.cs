@@ -26,6 +26,25 @@ public class RecorderApp : MonoBehaviour
     public UdpSender sender;
     public UdpServer server;
 
+    string parentFolder;
+    bool hide;
+
+    public void RecStartOsc(object[] data)
+    {
+        var filePath = Path.Combine(parentFolder, fileName + fileExtension);
+        if (!File.Exists(filePath))
+            recorder.StartRecording();
+    }
+
+    public void PlayStartOsc(object[] data)
+    {
+        fileName = (string)data[0];
+        var startTime = (float)data[1];
+        var filePath = Path.Combine(parentFolder, fileName + fileExtension);
+        if (File.Exists(filePath))
+            recorder.Play(filePath, startTime);
+    }
+
     public void OnError(System.Exception e)
     {
         error = e.ToString();
@@ -43,6 +62,10 @@ public class RecorderApp : MonoBehaviour
         windowRect = new Rect(new Vector2(x, y), new Vector2(windowWidth, windowHeight));
 
         recorder = GetComponent<UdpRecordPlayer>();
+
+        parentFolder = Path.Combine(Application.streamingAssetsPath, "udpData");
+        if (!Directory.Exists(parentFolder))
+            Directory.CreateDirectory(parentFolder);
     }
 
 
@@ -53,13 +76,14 @@ public class RecorderApp : MonoBehaviour
 
     void OnGUIWindow(int id)
     {
-        var parent = Path.Combine(Application.streamingAssetsPath, "udpData");
-        if (!Directory.Exists(parent))
-            Directory.CreateDirectory(parent);
+        if (hide = GUILayout.Toggle(hide, "Hide GUI"))
+            return;
+
+        GUILayout.Space(4);
 
         GUILayout.Label("FolderPath:");
-        if (GUILayout.Button(parent))
-            OpenInFileBrowser.Open(parent);
+        if (GUILayout.Button(parentFolder))
+            OpenInFileBrowser.Open(parentFolder);
 
         GUILayout.BeginHorizontal();
         GUILayout.Label("FileName: ");
@@ -69,7 +93,7 @@ public class RecorderApp : MonoBehaviour
 
         GUILayout.Space(16);
 
-        var filePath = Path.Combine(parent, fileName + fileExtension);
+        var filePath = Path.Combine(parentFolder, fileName + fileExtension);
         var exist = File.Exists(filePath);
 
         if (exist && !recorder.playing && !recorder.recording)

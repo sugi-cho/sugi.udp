@@ -89,6 +89,23 @@ public class UdpRecordPlayer : MonoBehaviour
         player = new Thread(PlayLoop);
         player.Start();
     }
+
+    public void Play(string filePath, float startTime)
+    {
+        playing = true;
+        startTime = Time.time - startTime;
+        time = startTime;
+
+        playFilePath = filePath;
+        if (!File.Exists(filePath))
+            return;
+
+        if (player != null)
+            player.Abort();
+        player = new Thread(PlayLoop);
+        player.Start();
+    }
+
     [ContextMenu("Stop Rec-Play")]
     public void Stop()
     {
