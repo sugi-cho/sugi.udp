@@ -28,7 +28,7 @@ public class RecorderApp : MonoBehaviour
 
     string parentFolder;
     bool hide;
-
+    #region cll methods via osc
     public void RecStartOsc(object[] data)
     {
         var filePath = Path.Combine(parentFolder, fileName + fileExtension);
@@ -44,6 +44,12 @@ public class RecorderApp : MonoBehaviour
         if (File.Exists(filePath))
             recorder.Play(filePath, startTime);
     }
+
+    public void StopOsc(object[] data)
+    {
+        recorder.Stop();
+    }
+    #endregion
 
     public void OnError(System.Exception e)
     {

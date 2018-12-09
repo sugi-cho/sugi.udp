@@ -55,7 +55,7 @@ public class UdpRecordPlayer : MonoBehaviour
                         var data = reader.ReadBytes(count);
                         list.Add(new TimeDataPair() { time = time, data = data });
                     }
-                    catch(EndOfStreamException)
+                    catch (EndOfStreamException)
                     {
                         enl = true;
                     }
@@ -90,11 +90,13 @@ public class UdpRecordPlayer : MonoBehaviour
         player.Start();
     }
 
-    public void Play(string filePath, float startTime)
+    public void Play(string filePath, float playStartTime)
     {
+        if (playing)
+            Stop();
         playing = true;
-        startTime = Time.time - startTime;
-        time = startTime;
+        startTime = Time.time - playStartTime;
+        time = playStartTime;
 
         playFilePath = filePath;
         if (!File.Exists(filePath))
@@ -163,6 +165,7 @@ public class UdpRecordPlayer : MonoBehaviour
         using (var reader = new BinaryReader(stream))
         {
             fileSize = stream.Length;
+            var preTime = time;
             while (playing)
             {
                 try
@@ -172,11 +175,14 @@ public class UdpRecordPlayer : MonoBehaviour
                     if (0 < count)
                     {
                         var data = reader.ReadBytes(count);
-                        while (time < nextTime && playing)
+                        if (preTime <= nextTime)
                         {
+                            while (time < nextTime && playing)
+                            {
 
+                            }
+                            sender.Send(data);
                         }
-                        sender.Send(data);
                     }
                     else
                         playing = false;
@@ -192,6 +198,7 @@ public class UdpRecordPlayer : MonoBehaviour
                 {
                     exception = e.ToString();
                 }
+                preTime = time;
             }
             reader.Close();
             stream.Close();
