@@ -165,17 +165,23 @@ public class UdpRecordPlayer : MonoBehaviour
         using (var reader = new BinaryReader(stream))
         {
             fileSize = stream.Length;
-            var preTime = time;
+            var startTime = time;
             while (playing)
             {
                 try
                 {
                     var nextTime = reader.ReadSingle();
                     var count = reader.ReadInt32();
+                    while(nextTime < startTime) {
+                        reader.ReadBytes(count);
+                        nextTime = reader.ReadSingle();
+                        count = reader.ReadInt32();
+                    }
+
+
                     if (0 < count)
                     {
                         var data = reader.ReadBytes(count);
-                        if (preTime <= nextTime)
                         {
                             while (time < nextTime && playing)
                             {
@@ -198,7 +204,6 @@ public class UdpRecordPlayer : MonoBehaviour
                 {
                     exception = e.ToString();
                 }
-                preTime = time;
             }
             reader.Close();
             stream.Close();
