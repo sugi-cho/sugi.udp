@@ -155,10 +155,10 @@ public class AsyncRecordPlayer : UdpServer
                                 writer.Write(pair.time);
                                 writer.Write(pair.data.Length);
                                 writer.Write(pair.data);
-                                fileSize = stream.Length;
                             }
                         }
                     }
+                    fileSize = stream.Length;
                 }
                 catch (System.Exception e)
                 {
