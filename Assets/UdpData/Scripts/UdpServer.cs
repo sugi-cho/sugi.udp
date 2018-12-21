@@ -17,10 +17,8 @@ public abstract class UdpServer : MonoBehaviour
 
     public void StartServer(int port)
     {
-        if (reader != null)
-            reader.Abort();
-        if (udp != null)
-            udp.Close();
+        StopServer();
+
         udp = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
         localPort = port;
@@ -28,6 +26,22 @@ public abstract class UdpServer : MonoBehaviour
 
         reader = new Thread(Reader);
         reader.Start();
+    }
+
+    public void StopServer()
+    {
+        if (udp != null)
+        {
+            udp.Shutdown(SocketShutdown.Both);
+            udp.Close();
+            udp = null;
+        }
+        if (reader != null)
+        {
+            reader.Abort();
+            reader.Join();
+            reader = null;
+        }
     }
 
     void Start()
@@ -39,10 +53,7 @@ public abstract class UdpServer : MonoBehaviour
 
     private void OnDestroy()
     {
-        udp.Close();
-        udp = null;
-        reader.Abort();
-        reader = null;
+        StopServer();
     }
 
     void Reader()
