@@ -77,12 +77,14 @@ public class AsyncRecordPlayer : UdpServer
     [ContextMenu("Start Recording")]
     public void StartRecording()
     {
+        Stop();
+
         recording = true;
         startTime = GetCurrentTime();
-        recordQueue.Clear();
 
-        if (recorder != null)
-            recorder.Abort();
+        lock(recordQueue)
+            recordQueue.Clear();
+
         recorder = new Thread(RecordLoop);
         recorder.Start();
     }
@@ -90,12 +92,12 @@ public class AsyncRecordPlayer : UdpServer
     [ContextMenu("Play RecordedData")]
     public void Play()
     {
+        Stop();
+
         playing = true;
         startTime = GetCurrentTime();
         time = 0;
 
-        if (player != null)
-            player.Abort();
         player = new Thread(PlayLoop);
         player.Start();
     }
@@ -106,17 +108,23 @@ public class AsyncRecordPlayer : UdpServer
         recording = false;
         playing = false;
         if (recorder != null)
+        {
             recorder.Abort();
-        recorder = null;
+            recorder.Join();
+            recorder = null;
+        }
         if (player != null)
+        {
             player.Abort();
-        player = null;
+            player.Join();
+            player = null;
+        }
     }
 
     public void Play(string filePath, float playStartTime)
     {
-        if (playing)
-            Stop();
+        Stop();
+
         playing = true;
         startTime = GetCurrentTime() - playStartTime;
         time = playStartTime;
@@ -125,8 +133,6 @@ public class AsyncRecordPlayer : UdpServer
         if (!File.Exists(filePath))
             return;
 
-        if (player != null)
-            player.Abort();
         player = new Thread(PlayLoop);
         player.Start();
     }
