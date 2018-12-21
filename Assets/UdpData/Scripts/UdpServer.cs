@@ -32,6 +32,7 @@ public abstract class UdpServer : MonoBehaviour
     {
         if (udp != null)
         {
+            udp.Shutdown(SocketShutdown.Both);
             udp.Close();
             udp = null;
         }
