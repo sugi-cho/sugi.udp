@@ -32,7 +32,6 @@ public abstract class UdpServer : MonoBehaviour
     {
         if (udp != null)
         {
-            udp.Shutdown(SocketShutdown.Both);
             udp.Close();
             udp = null;
         }
@@ -50,8 +49,7 @@ public abstract class UdpServer : MonoBehaviour
         StartServer(localPort);
     }
 
-
-    private void OnDestroy()
+    void OnApplicationQuit()
     {
         StopServer();
     }
@@ -59,7 +57,7 @@ public abstract class UdpServer : MonoBehaviour
     void Reader()
     {
         var clientEndpoint = new IPEndPoint(IPAddress.Any, 0);
-        while (udp != null)
+        while (udp != null && udp.IsBound)
         {
             try
             {
