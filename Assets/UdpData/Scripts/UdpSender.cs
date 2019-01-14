@@ -5,66 +5,15 @@ using UnityEngine;
 
 public class UdpSender : MonoBehaviour
 {
-    public string sendTextData = "test";
-    public string remoteIp = "localhost";
-    public bool useBroadCast;
-    public int remotePort = 8888;
-
-    Socket udp;
-    IPEndPoint remote;
-
-    public void CreateRemoteEP(string ip, int port)
+    public static void Send(string text, IPEndPoint remote)
     {
-        remoteIp = ip;
-        remotePort = port;
-
-        if (useBroadCast)
-            remote = new IPEndPoint(IPAddress.Broadcast, remotePort);
-        else
-            remote = new IPEndPoint(FindFromHostName(remoteIp), port);
-    }
-
-    [ContextMenu("send test")]
-    void Send()
-    {
-        Send(sendTextData);
-    }
-
-    public void Send<T>(T data, IPEndPoint remote = null)
-    {
-        var text = JsonUtility.ToJson(data);
-        if (remote == null)
-            remote = this.remote;
-        Send(text, remote);
-    }
-
-    public void Send(string text, IPEndPoint remote = null)
-    {
-        sendTextData = text;
-        var data = Encoding.UTF8.GetBytes(sendTextData);
+        var data = Encoding.UTF8.GetBytes(text);
         Send(data, remote);
     }
-
-    public void Send(byte[] data, IPEndPoint remote = null)
-    {
-        if (remote == null)
-            remote = this.remote;
-        udp.SendTo(data, remote);
+    public static void Send(byte[] data, IPEndPoint remote) {
+        UdpSocket.SendTo(data, remote);
     }
-
-    void Start()
-    {
-        udp = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        CreateRemoteEP(remoteIp, remotePort);
-    }
-
-    private void OnDestroy()
-    {
-        udp.Close();
-        udp = null;
-    }
-
-    public IPAddress FindFromHostName(string hostname)
+    public static IPAddress FindFromHostName(string hostname)
     {
         var addresses = Dns.GetHostAddresses(hostname);
         IPAddress address = IPAddress.None;
@@ -77,5 +26,57 @@ public class UdpSender : MonoBehaviour
             }
         }
         return address;
+    }
+
+    public string remoteIp = "localhost";
+    public bool useBroadCast;
+    public int remotePort = 8888;
+    IPEndPoint remote;
+
+    static Socket UdpSocket
+    {
+        get
+        {
+            if (_udp == null)
+            {
+                _udp = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                Application.quitting += CloseSocket;
+            }
+            return _udp;
+        }
+    }
+    static Socket _udp;
+    static void CloseSocket()
+    {
+        if (_udp != null)
+        {
+            _udp.Close();
+            _udp = null;
+        }
+    }
+
+    public void CreateRemoteEP(string ip, int port)
+    {
+        remoteIp = ip;
+        remotePort = port;
+
+        if (useBroadCast)
+            remote = new IPEndPoint(IPAddress.Broadcast, remotePort);
+        else
+            remote = new IPEndPoint(FindFromHostName(remoteIp), port);
+    }
+
+    public void Send(string text)
+    {
+        Send(text, remote);
+    }
+    public void Send(byte[] data)
+    {
+        Send(data, remote);
+    }
+
+    void Start()
+    {
+        CreateRemoteEP(remoteIp, remotePort);
     }
 }

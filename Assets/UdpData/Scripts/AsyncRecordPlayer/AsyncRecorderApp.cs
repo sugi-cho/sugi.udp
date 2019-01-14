@@ -22,9 +22,11 @@ public class AsyncRecorderApp : MonoBehaviour
     string remoteIp;
     int remotePort;
     int localPort;
+    int oscPort;
 
     public UdpSender sender;
     public UdpServer server;
+    OscServer oscServer;
 
     string parentFolder;
     bool hide;
@@ -59,9 +61,12 @@ public class AsyncRecorderApp : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        oscServer = GetComponent<OscServer>();
+
         remoteIp = sender.remoteIp;
         remotePort = sender.remotePort;
         localPort = server.localPort;
+        oscPort = oscServer.localPort;
 
         var x = Screen.width / 2f - windowWidth / 2f;
         var y = Screen.height / 2f - windowHeight / 2f;
@@ -147,6 +152,9 @@ public class AsyncRecorderApp : MonoBehaviour
             GUILayout.Space(8);
             if (SetPortField("Local Port: ", ref localPort))
                 server.StartServer(localPort);
+            GUILayout.Space(8);
+            if (SetPortField("OSC Port: ", ref oscPort))
+                oscServer.StartServer(oscPort);
             GUILayout.EndVertical();
         }
 

@@ -10,9 +10,13 @@ public class OscServer : UdpServer
 {
     public OscMsgEvent onDataReceived;
     public List<OscAddressEventPair> oscAddressEvents;
+    public int logCapacity = 30;
 
     Parser oscParser = new Parser();
     Queue<Message> receivedDataQueue = new Queue<Message>();
+
+    public IEnumerable<LogOsc> OscLog { get { return oscLogger; } }
+    Queue<LogOsc> oscLogger = new Queue<LogOsc>();
 
     protected override void OnReadPacket(byte[] buffer, int length, IPEndPoint source)
     {
@@ -24,6 +28,13 @@ public class OscServer : UdpServer
                 var msg = oscParser.PopMessage();
                 lock (receivedDataQueue)
                     receivedDataQueue.Enqueue(msg);
+
+                lock (oscLogger)
+                {
+                    oscLogger.Enqueue(new LogOsc() { date = System.DateTime.Now.ToString(), oscMsg = msg.ToString(), source = source.ToString() });
+                    while (logCapacity < oscLogger.Count)
+                        oscLogger.Dequeue();
+                }
             }
         }
     }
@@ -35,6 +46,7 @@ public class OscServer : UdpServer
             {
                 var msg = receivedDataQueue.Dequeue();
                 onDataReceived.Invoke(msg);
+
                 var address = msg.path;
                 var events = oscAddressEvents.Where(pair => pair.oscAddress == address).Select(pair => pair.oscEvent);
                 foreach (var e in events)
@@ -42,6 +54,14 @@ public class OscServer : UdpServer
             }
     }
 
+    [System.Serializable]
+    public struct LogOsc
+    {
+        public string date;
+        public string oscMsg;
+        public string source;
+
+    }
     [System.Serializable]
     public class OscMsgEvent : UnityEvent<Message> { }
     [System.Serializable]
