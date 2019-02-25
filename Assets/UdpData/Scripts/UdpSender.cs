@@ -10,7 +10,8 @@ public class UdpSender : MonoBehaviour
         var data = Encoding.UTF8.GetBytes(text);
         Send(data, remote);
     }
-    public static void Send(byte[] data, IPEndPoint remote) {
+    public static void Send(byte[] data, IPEndPoint remote)
+    {
         UdpSocket.SendTo(data, remote);
     }
     public static IPAddress FindFromHostName(string hostname)
@@ -40,6 +41,7 @@ public class UdpSender : MonoBehaviour
             if (_udp == null)
             {
                 _udp = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                _udp.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
                 Application.quitting += CloseSocket;
             }
             return _udp;

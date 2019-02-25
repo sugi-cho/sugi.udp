@@ -22,6 +22,7 @@ public abstract class UdpServer : MonoBehaviour
         udp = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
         localPort = port;
+        udp.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
         udp.Bind(new IPEndPoint(IPAddress.Any, localPort));
 
         reader = new Thread(Reader);
