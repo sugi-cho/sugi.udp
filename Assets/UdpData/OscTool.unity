@@ -324,8 +324,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   remoteIp: localhost
-  useBroadCast: 0
-  remotePort: 8888
+  useBroadCast: 1
+  remotePort: 6454
 --- !u!114 &2052002482
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -338,13 +338,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74af7d198c1b35e428513d5f24b50cde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  localPort: 8888
+  localPort: 6454
   receiveLimit: 10
   errorMsg: 
   onDataReceived:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: OscServer+OscMsgEvent, Assembly-CSharp, Version=1.0.6954.1546, Culture=neutral,
+    m_TypeName: OscServer+OscMsgEvent, Assembly-CSharp, Version=1.0.6997.2999, Culture=neutral,
       PublicKeyToken=null
   oscAddressEvents: []
   logCapacity: 30

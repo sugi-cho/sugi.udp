@@ -8,11 +8,20 @@ using ArtNet.Packets;
 public class ArtNetServer : UdpServer
 {
     public ArtNetEvent onDataReceived;
-    public List<DmxUniverseEventPair> dmxUniverseEvents;
+    public UniverseDmxDataEvent onDmxData;
     public DmxMergeMode dmxMergeMode;
 
+    Dictionary<int, byte[]> _universeDmxDataMap;
+    public Dictionary<int, byte[]> UniverseDmxDataMap
+    {
+        get
+        {
+            if (_universeDmxDataMap == null)
+                _universeDmxDataMap = new Dictionary<int, byte[]>();
+            return _universeDmxDataMap;
+        }
+    }
     Queue<ArtNetPacket> receivedDataQueue = new Queue<ArtNetPacket>();
-    Dictionary<int, byte[]> universeDmxDataMap = new Dictionary<int, byte[]>();
     Queue<int> updateUniverseQueue = new Queue<int>();
 
     private void Reset()
@@ -38,9 +47,11 @@ public class ArtNetServer : UdpServer
                 var dmxData = dmxPacket.DmxData;
                 var mergedDmxData = DmxMerge.GetMergedDmxData(universe, dmxData, dmxMergeMode, source);
 
-                if (!universeDmxDataMap.ContainsKey(universe))
-                    universeDmxDataMap.Add(universe, Enumerable.Repeat((byte)0, 512).ToArray());
-                System.Buffer.BlockCopy(mergedDmxData, 0, universeDmxDataMap[universe], 0, mergedDmxData.Length);
+                if (_universeDmxDataMap == null)
+                    _universeDmxDataMap = new Dictionary<int, byte[]>();
+                if (!_universeDmxDataMap.ContainsKey(universe))
+                    _universeDmxDataMap.Add(universe, Enumerable.Repeat((byte)0, 512).ToArray());
+                System.Buffer.BlockCopy(mergedDmxData, 0, _universeDmxDataMap[universe], 0, mergedDmxData.Length);
 
                 if (!updateUniverseQueue.Contains(universe))
                     lock (updateUniverseQueue)
@@ -59,10 +70,8 @@ public class ArtNetServer : UdpServer
             while (0 < updateUniverseQueue.Count)
             {
                 var universe = updateUniverseQueue.Dequeue();
-                var events = dmxUniverseEvents.Where(pair => pair.universe == universe).Select(pair => pair.dmxEvent);
-                var dmxData = universeDmxDataMap[universe];
-                foreach (var e in events)
-                    e.Invoke(dmxData);
+                var dmxData = _universeDmxDataMap[universe];
+                onDmxData.Invoke(universe, dmxData);
                 if (dmxMergeMode == DmxMergeMode.HTP)
                     DmxMerge.ClearForHTP();
             }
@@ -144,12 +153,5 @@ public class ArtNetServer : UdpServer
     [System.Serializable]
     public class ArtNetEvent : UnityEvent<ArtNetPacket> { }
     [System.Serializable]
-    public class DmxDataEvent : UnityEvent<byte[]> { }
-    [System.Serializable]
-    public struct DmxUniverseEventPair
-    {
-        public string label;
-        public int universe;
-        public DmxDataEvent dmxEvent;
-    }
+    public class UniverseDmxDataEvent : UnityEvent<int, byte[]> { }
 }
