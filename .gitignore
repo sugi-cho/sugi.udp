@@ -35,6 +35,5 @@ sysinfo.txt
 *.apk
 *.unitypackage
 *.data
-*.udp
 UdpRecoder/
 UdpRecorder/
