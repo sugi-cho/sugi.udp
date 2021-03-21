@@ -16,7 +16,7 @@ namespace sugi.cc.udp.artnet
         byte[][] dmx;
 
         Queue<ArtNetPacket> receivedDataQueue = new Queue<ArtNetPacket>();
-        Queue<int> updateUniverseQueue = new Queue<int>();
+        Queue<short> updateUniverseQueue = new Queue<short>();
 
         private void Reset()
         {
@@ -135,6 +135,6 @@ namespace sugi.cc.udp.artnet
         [System.Serializable]
         public class ArtNetEvent : UnityEvent<ArtNetPacket> { }
         [System.Serializable]
-        public class UniverseDmxDataEvent : UnityEvent<int, byte[]> { }
+        public class UniverseDmxDataEvent : UnityEvent<short, byte[]> { }
     }
 }

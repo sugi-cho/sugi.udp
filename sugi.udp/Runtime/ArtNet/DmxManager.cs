@@ -35,7 +35,7 @@ namespace sugi.cc.udp.artnet
             UdpSender.Send(dmxToSend.ToArray(), remote);
         }
 
-        public void OnDmxData(int universe, byte[] dmxData)
+        public void OnDmxData(short universe, byte[] dmxData)
         {
             if (dmx[universe] == null)
                 dmx[universe] = new byte[512];
