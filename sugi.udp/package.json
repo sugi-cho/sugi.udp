@@ -1,10 +1,10 @@
 {
-  "name": "sugicc.udp",
+  "name": "sugi.udp",
   "displayName": "sugi.udp",
   "version": "0.1.0",
   "unity": "2020.1",
   "description": "udpData package",
   "author": {
-    "name": "SamplePackage"
+    "name": "sugi-cho"
   }
 }
