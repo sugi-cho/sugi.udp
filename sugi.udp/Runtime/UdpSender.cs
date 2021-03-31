@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace sugi.cc.udp
 {
-    public class UdpSender : MonoBehaviour
+    public class UdpSender
     {
         public static void Send(string text, IPEndPoint remote)
         {
@@ -77,11 +77,6 @@ namespace sugi.cc.udp
         public void Send(byte[] data)
         {
             Send(data, remote);
-        }
-
-        void Start()
-        {
-            CreateRemoteEP(remoteIp, remotePort);
         }
     }
 }
