@@ -18,9 +18,14 @@ namespace sugi.cc.udp.artnet
     }
     public interface IDmxOutputModule
     {
+        public string Label { get; set; }
         int StartChannel { get; }
         int NumChannels { get; }
         void SetChannel(int channel);
         void SetDmx(ref byte[] dmx);
+    }
+    public interface IDmxOutputUseFine
+    {
+        bool UseFine { get; set; }
     }
 }
