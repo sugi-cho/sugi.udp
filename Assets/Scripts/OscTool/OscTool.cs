@@ -15,8 +15,8 @@ public class OscTool : MonoBehaviour
     Rect windowRect;
     Vector2 scrollPos;
 
-    string remoteIp;
-    int remotePort;
+    [SerializeField] string remoteIp = "localhost";
+    [SerializeField] int remotePort = 3333;
     int localPort;
     int logCapacity;
 
@@ -26,8 +26,6 @@ public class OscTool : MonoBehaviour
         var h = Screen.height;
         windowRect = Rect.MinMaxRect(w * 0.1f, h * 0.1f, w * 0.9f, h * 0.9f);
 
-        remoteIp = sender.remoteIp;
-        remotePort = sender.remotePort;
         localPort = server.localPort;
         logCapacity = server.logCapacity;
     }
